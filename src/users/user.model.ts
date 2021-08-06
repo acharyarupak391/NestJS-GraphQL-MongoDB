@@ -7,7 +7,7 @@ export class User {
     private programmer: boolean,
   ) {}
 
-  get id() {
+  get id(): number {
     return this._id;
   }
 }

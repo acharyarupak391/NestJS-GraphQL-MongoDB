@@ -3,10 +3,10 @@ import { User } from "./user.model";
 
 @Injectable()
 export class UsersService {
-  users: User[] = []
+  private users: User[] = []
 
   getUsers(): User[] {
-    return this.users;
+    return [...this.users];
   }
 
   addUser(body: {name: string, age: number, sex: string, programmer: boolean}): User {
