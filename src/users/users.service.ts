@@ -5,8 +5,6 @@ import { User } from "./user.model";
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
-
   constructor(@InjectModel('User') private userModel: Model<User>) {}
 
   async getUsers(): Promise<User[]> {
