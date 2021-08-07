@@ -1,8 +1,25 @@
-import { Body, Controller, Get, Header, Post, Req, UploadedFile, UploadedFiles, UseInterceptors } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Header,
+  HttpException,
+  HttpStatus,
+  NotFoundException,
+  Param,
+  Patch,
+  Post,
+  Query,
+  Req,
+  UploadedFile,
+  UploadedFiles,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AnyFilesInterceptor, FileInterceptor } from '@nestjs/platform-express';
 import { User } from './user.model';
 import { UsersService } from './users.service';
-import { diskStorage } from "multer"
+import { diskStorage } from 'multer';
 
 import { writeFile } from 'fs';
 import { join } from 'path';
@@ -12,20 +29,40 @@ export class UsersController {
 
   @Get()
   // @Header('Content-Type', 'application/json')
-  getUsers(): User[] {
+  getAllUsers(): User[] {
     return this.usersService.getUsers();
   }
-  
+
   @Post()
-  // addUser(@Req() req): any {    // will give the whole request object
   addUser(@Body() body): User {
     let _addedUser = this.usersService.addUser(body);
     return _addedUser;
   }
 
-  // Getting form data is possible using some file interceptor
+  @Get(':id')
+  getUser(@Param() param): User {
+    let _user = this.usersService.findUser(param);
+    if (_user) return _user;
+    else {
+      throw new NotFoundException('User not found!')
+    }
+  }
+
+  @Patch(':id')
+  updateUser(@Param('id') id, @Body() body): User {
+    let _updatedUser = this.usersService.updateUser(id, body);
+    if(_updatedUser) return _updatedUser;
+    else throw new NotFoundException("User not found");
+  }
   
-  @Post("upload")
+  @Delete(':id')
+  deleteUser(@Param('id') id): any {
+    let _deleted = this.usersService.deleteUser(id);
+    if (_deleted) return { message: 'User Deleted Successfully!' };
+    else throw new NotFoundException('User not found');
+  }
+
+  @Post('upload')
   // @UseInterceptors(FileInterceptor('file', {
   //   storage: diskStorage({
   //     filename: function (req, file, cb) {
@@ -37,15 +74,14 @@ export class UsersController {
   // fileUpload(@UploadedFile() file): any {
   //   console.log('file: ', file);
   // }
-    
-  // to get all files from form data and can use req.body to get other form data
+
+  // to get all files from form data and can use req.body or @Body to get other form data
   @UseInterceptors(AnyFilesInterceptor())
   fileUpload(@UploadedFiles() files): any {
-    for(let file of files) {
-     writeFile(join('my-uploads', 'buffer.jpg'), file.buffer, err => {
-       if(err) console.log('error: ', err)
-     })
-   }
+    for (let file of files) {
+      writeFile(join('my-uploads', 'buffer.jpg'), file.buffer, (err) => {
+        if (err) console.log('error: ', err);
+      });
+    }
   }
-    
 }

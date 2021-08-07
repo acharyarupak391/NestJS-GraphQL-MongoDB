@@ -10,4 +10,20 @@ export class User {
   get id(): number {
     return this._id;
   }
+
+  set _name(newName) {
+    this.name = newName;
+  }
+
+  set _age(newAge) {
+    this.age = newAge;
+  }
+
+  set _sex(newSex) {
+    this.sex = newSex;
+  }
+
+  set _programmer(newProgrammer) {
+    this.programmer = newProgrammer;
+  }
 }
