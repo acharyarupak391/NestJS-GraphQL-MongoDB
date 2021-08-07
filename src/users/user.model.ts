@@ -1,29 +1,38 @@
-export class User {
-  constructor(
-    private _id: number,
-    private name: string,
-    private age: number,
-    private sex: string,
-    private programmer: boolean,
-  ) {}
+import * as mongoose from 'mongoose';
 
-  get id(): number {
-    return this._id;
-  }
+export const UserSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    age: {
+      type: Number,
+      required: true,
+    },
+    sex: {
+      type: String,
+      required: true,
+    },
+    programmer: {
+      type: Boolean,
+      required: true,
+    },
+  },
+  {
+    timestamps: true,
+  },
+);
 
-  set _name(newName) {
-    this.name = newName;
-  }
-
-  set _age(newAge) {
-    this.age = newAge;
-  }
-
-  set _sex(newSex) {
-    this.sex = newSex;
-  }
-
-  set _programmer(newProgrammer) {
-    this.programmer = newProgrammer;
-  }
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  age: number;
+  sex: string;
+  programmer: boolean;
 }

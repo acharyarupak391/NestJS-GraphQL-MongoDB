@@ -1,38 +1,67 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
 import { User } from "./user.model";
 
 @Injectable()
 export class UsersService {
-  private users: User[] = []
+  private users: User[] = [];
 
-  getUsers(): User[] {
-    return [...this.users];
+  constructor(@InjectModel('User') private userModel: Model<User>) {}
+
+  async getUsers(): Promise<User[]> {
+    const _users = await this.userModel.find().sort({createdAt: "desc"}).exec();
+    return _users;
   }
 
-  addUser(body: {name: string, age: number, sex: string, programmer: boolean}): User {
-    let _userId = new Date().getTime();
-    let _newUser = new User(_userId, body.name, body.age, body.sex, body.programmer);
-    this.users.unshift(_newUser);   // add new user to beginning of the array
-    return _newUser;
+  async addUser(body: {
+    name: string;
+    email: string;
+    age: number;
+    sex: string;
+    programmer: boolean;
+  }): Promise<{id: string}> {
+    let _newUser = new this.userModel({
+      name: body.name,
+      email: body.email,
+      age: body.age,
+      sex: body.sex,
+      programmer: body.programmer,
+    });
+    const result = await _newUser.save();    // save to collection
+    return {id: result._id};
   }
 
-  findUser(param: {id: string}): User {
-    return this.users.find(user => user.id === parseInt(param.id));
-  } 
-  
-  updateUser(id: string, body: {name: string, age: string, sex: string, programmer: string}): User {
-    let _user = this.findUser({id: id});
-    if(!_user) return _user;
-    if(body.name) _user._name = body.name;
-    if(body.age) _user._age = body.age;
-    if(body.sex) _user._sex = body.sex;
-    if(body.programmer) _user._programmer = body.programmer;    
+  async findUser(param: { id: string }): Promise<User> {
+    let _user;
+    try {
+      _user = await this.userModel.findById(param.id);
+    } catch(err) {
+      throw new NotFoundException('User not found!')
+    }
     return _user;
   }
 
-  deleteUser(id: string): boolean {
-    if(this.users.findIndex(user => user.id === parseInt(id)) === -1) return false;
-    this.users = this.users.filter(user => user.id !== parseInt(id));
-    return true;
+  async updateUser(
+    id: string,
+    body,
+  ): Promise<{id: string}> {
+    let _user;
+    try {
+      _user = await this.userModel.findByIdAndUpdate(id, body, {new: true, useFindAndModify: false});
+    } catch(err) {
+      throw new NotFoundException("User not found!")
+    }
+    return {id: _user._id}
+  }
+
+  async deleteUser(id: string): Promise<User> {
+    let _deleted;
+    try {
+      _deleted = await this.userModel.findByIdAndDelete(id)
+    } catch(err) {
+      throw new NotFoundException("User not found!")
+    }
+    return _deleted;
   }
 }
