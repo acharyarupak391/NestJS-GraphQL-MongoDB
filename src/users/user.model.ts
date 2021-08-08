@@ -1,29 +1,27 @@
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
+import * as mongoose from "mongoose";
+
+@ObjectType()
 export class User {
-  constructor(
-    private _id: number,
-    private name: string,
-    private age: number,
-    private sex: string,
-    private programmer: boolean,
-  ) {}
+  @Field(type => ID)
+  id: string;
 
-  get id(): number {
-    return this._id;
-  }
+  @Field()
+  name: string;
 
-  set _name(newName) {
-    this.name = newName;
-  }
+  @Field()
+  email: string;
 
-  set _age(newAge) {
-    this.age = newAge;
-  }
+  @Field(type => Int)
+  age: number;
 
-  set _sex(newSex) {
-    this.sex = newSex;
-  }
-
-  set _programmer(newProgrammer) {
-    this.programmer = newProgrammer;
-  }
+  @Field()
+  sex: string;
 }
+
+export const UserSchema = new mongoose.Schema({
+  name: String,
+  email: String,
+  age: Number,
+  sex: String
+}, {collection: "users-gql"})
