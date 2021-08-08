@@ -9,14 +9,13 @@ export class UsersResolver {
 
   @Query(() => [User])
   getAllUsers(): Promise<User[]> {
-    return this.usersService.findAll();
+    return this.usersService.getUsers();
   }
 
   @Mutation(() => User)
-  async addUser(@Args() args: UsersArgs): Promise<User> {
-    console.log(args);
-    const recipe = await this.usersService.create();
-    return recipe;
+  async addUser(@Args() args: UsersArgs): Promise<any> {
+    const recipe = await this.usersService.addUser(args);
+    
   }
 
   // @Query( => Recipe)
