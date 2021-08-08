@@ -1,5 +1,6 @@
+import { NotFoundException } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UsersArgs } from './dto/users.args';
+import { AddUserArgs, UpdateUserArgs } from './dto/users.args';
 import { User } from './user.model';
 import { UsersService } from './users.service';
 
@@ -9,31 +10,29 @@ export class UsersResolver {
 
   @Query(() => [User])
   getAllUsers(): Promise<User[]> {
-    return this.usersService.getUsers();
+    const _users = this.usersService.getUsers();
+    return _users;
   }
 
   @Mutation(() => User)
-  async addUser(@Args() args: UsersArgs): Promise<any> {
-    const recipe = await this.usersService.addUser(args);
-    
+  addUser(@Args() args: AddUserArgs): Promise<User> {
+    const _user = this.usersService.addUser(args);
+    return _user;
   }
 
-  // @Query( => Recipe)
-  // async recipe(@Args('id') id: string): Promise<Recipe> {
-  //   const recipe = await this.usersService.findOneById(id);
-  //   if (!recipe) {
-  //     throw new NotFoundException(id);
-  //   }
-  //   return recipe;
-  // }
+  @Query(() => User)
+  getSingleUser(@Args('id') id: string): Promise<User> {
+    const _user = this.usersService.getUser(id);
+    return _user;
+  }
 
-  // @Mutation( => Boolean)
-  // async removeRecipe(@Args('id') id: string) {
-  //   return this.usersService.remove(id);
-  // }
+  @Mutation(() => Boolean)
+  deleteUser(@Args('id') id: string) {
+    return this.usersService.deleteUser(id);
+  }
 
-  // @Subscription( => Recipe)
-  // recipeAdded() {
-  //   return pubSub.asyncIterator('recipeAdded');
-  // }
+  @Mutation(() => User)
+  updateUser(@Args('id') id: string, @Args() body: UpdateUserArgs) {
+    return this.usersService.updateUser(id, body);
+  }
 }
