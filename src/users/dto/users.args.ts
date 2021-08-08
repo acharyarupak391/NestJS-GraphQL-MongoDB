@@ -11,6 +11,6 @@ export class UsersArgs {
   @Field(type => Int)
   age;
   
-  @Field(type => String, {nullable: true})
+  @Field(type => String)
   sex;
 }

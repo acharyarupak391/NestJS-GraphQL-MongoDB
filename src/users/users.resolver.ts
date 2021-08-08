@@ -8,14 +8,14 @@ export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Query(() => [User])
-  getAllUsers(): Promise<User[]> {
+  getAllUsers(): User[] {
     return this.usersService.getUsers();
   }
 
-  @Mutation(() => User)
-  async addUser(@Args() args: UsersArgs): Promise<any> {
-    const recipe = await this.usersService.addUser(args);
-    
+  @Mutation(returns => User)
+  addUser(@Args() args: UsersArgs) {
+    const _newUser = this.usersService.addUser(args);
+    return _newUser;    
   }
 
   // @Query( => Recipe)
